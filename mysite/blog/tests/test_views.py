@@ -7,8 +7,7 @@ class TestListView(ModelMixinTestCase, TestCase):
     def test_list_view_uses_correct_template(self):
         response = self.client.get(reverse("blog:post_list"))
         self.assertTemplateUsed(response, "blog/post/list.html")
-<<<<<<< HEAD
-=======
+
 
 class TestDetailView(ModelMixinTestCase, TestCase):
     def test_post_detail_template_used(self):
@@ -45,4 +44,27 @@ class TestDetailView(ModelMixinTestCase, TestCase):
         response = self.client.get(incorrect_post_detail_url)
 
         self.assertEqual(404, response.status_code)
->>>>>>> 7b3ab53 (Create detail view)
+
+
+
+def test_pagination_returns_last_page_if_page_out_of_range(self):
+    response = self.client.get(
+        reverse("blog:post_list"),
+        {"page": 999, "posts": self.create_published_posts(4)},
+    )
+    self.assertEquals(
+        response.context["posts"].number,
+        response.context["posts"].paginator.page(2).number,
+    )
+
+
+def test_pagination_returns_first_page_if_page_is_empty(self):
+    response = self.client.get(
+        reverse("blog:post_list"),
+        {"page": "", "posts": self.create_published_posts(4)},
+    )
+
+    self.assertEquals(
+        response.context["posts"].number,
+        response.context["posts"].paginator.page(1).number,
+    )

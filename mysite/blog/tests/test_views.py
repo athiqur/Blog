@@ -4,6 +4,6 @@ from django.urls import reverse
 
 
 class TestListView(ModelMixinTestCase, TestCase):
-    def test_post_list_GET(self):
-        template = self.client.get(reverse("blog:post_list"))
-        self.assertTemplateUsed(template, "blog/post/list.html")
+    def test_list_view_uses_correct_template(self):
+        response = self.client.get(reverse("blog:post_list"))
+        self.assertTemplateUsed(response, "blog/post/list.html")

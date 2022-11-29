@@ -16,11 +16,11 @@ def paginate(queryset, page, per_page):
 
 
 def post_list(request):
-    posts = paginate(Post.published.all(), request.Get.get("page"), 3)
+    posts = paginate(Post.published.all(), request.GET.get("page"), 3)
     return render(
         request,
         "blog/post/list.html",
-        {"page": request.Get.get("page"), "posts": posts},
+        {"page": request.GET.get("page"), "posts": posts},
     )
 
 

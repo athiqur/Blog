@@ -21,4 +21,5 @@ class ModelMixinTestCase(TestCase):
             author=self.user,
             body="Testing Published",
             status="published",
+            slug="published",
         )

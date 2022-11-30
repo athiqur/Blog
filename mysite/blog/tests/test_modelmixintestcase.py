@@ -21,4 +21,8 @@ class ModelMixinTestCase(TestCase):
             author=self.user,
             body="Testing Published",
             status="published",
+<<<<<<< HEAD
+=======
+            slug="published",
+>>>>>>> 7b3ab53 (Create detail view)
         )

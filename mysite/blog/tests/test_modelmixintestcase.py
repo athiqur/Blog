@@ -26,3 +26,16 @@ class ModelMixinTestCase(TestCase):
             slug="published",
 >>>>>>> 7b3ab53 (Create detail view)
         )
+
+    def create_published_posts(self, count):
+        posts = []
+        for _ in range(count):
+            post = Post.objects.create(
+                title="Published2",
+                author=self.user,
+                body="Testing Published2",
+                status="published",
+                slug="published2",
+            )
+            posts.append(post)
+        return posts

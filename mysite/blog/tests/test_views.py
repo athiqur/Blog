@@ -2,6 +2,7 @@ from blog.tests.test_modelmixintestcase import ModelMixinTestCase
 from django.test import TestCase
 from django.urls import reverse
 from blog.models import Post
+from blog.forms import EmailPostForm
 
 
 class TestListView(ModelMixinTestCase, TestCase):
@@ -83,3 +84,12 @@ def test_pagination_returns_first_page_if_page_is_empty(self):
         response.context["posts"].number,
         response.context["posts"].paginator.page(1).number,
     )
+
+
+class TestPostShareView(ModelMixinTestCase, TestCase):
+    def test_post_share_uses_correct_template(self):
+        self.post_share_url = reverse(
+            "blog:post_share", args=[self.published_post.id]
+        )
+        response = self.client.get(self.post_share_url)
+        self.assertTemplateUsed(response, "blog/post/share.html")

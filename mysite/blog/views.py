@@ -1,9 +1,11 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Post
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.views.generic import ListView
+from django.views.generic import ListView, FormView
 from .forms import EmailPostForm
+from django.urls import reverse_lazy
 from django.core.mail import send_mail
+from django.contrib.messages.views import SuccessMessageMixin
 
 
 class PostListView(ListView):
@@ -25,39 +27,30 @@ def post_detail(request, year, month, day, post_slug):
     return render(request, "blog/post/detail.html", {"post": post})
 
 
-def post_share(request, post_id):
-    post = get_object_or_404(Post, id=post_id, status="published")
-    form = get_forms_post_request_data_or_none(
-        request.POST or None, EmailPostForm
-    )
-    if form.is_valid():
-        send_email(request, post, form.cleaned_data)
-    else:
-        form = get_empty_form(EmailPostForm)
-    return render(
-        request,
-        "blog/post/share.html",
-        {
-            "post": post,
-            "form": form,
-            "sent": form.is_valid(),
-        },
-    )
+class PostShareView(SuccessMessageMixin, FormView):
+    form_class = EmailPostForm
+    template_name = "blog/post/share.html"
+    success_url = reverse_lazy("blog:post_list")
+    success_message = "mail sent"
 
+    def dispatch(self, request, *args, **kwargs):
+        self.post_object = get_object_or_404(
+            Post, id=self.kwargs.get("post_id")
+        )
+        return super().dispatch(request, args, kwargs)
 
-def get_forms_post_request_data_or_none(request, EmailPostForm):
-    return EmailPostForm(request)
+    def form_valid(self, form):
+        self.send_mail(form.cleaned_data)
+        return super(PostShareView, self).form_valid(form)
 
-
-def get_empty_form(EmailPostForm):
-    return EmailPostForm()
-
-
-def send_email(request, post, cleaned_data):
-    post_url = request.build_absolute_uri(post.get_absolute_url())
-    subject = f"{cleaned_data['name']} recommends you read " f"{post.title}"
-    message = (
-        f"Read {post.title} at {post_url}\n\n"
-        f"{cleaned_data['name']}'s comments: {cleaned_data['comments']}"
-    )
-    send_mail(subject, message, "athiqurking@gmail.com", [cleaned_data["to"]])
+    def send_mail(self, valid_data):
+        post_url = self.request.build_absolute_uri(
+            self.post_object.get_absolute_url()
+        )
+        send_mail(
+            message=f"Read {self.post_object.title} at { post_url }\n\n"
+            f"{valid_data['from_name']}'s message: {valid_data['share_message']}",
+            from_email=valid_data["from_email"],
+            subject=f"{valid_data['from_name']} recommends you read {self.post_object.title}",
+            recipient_list=[valid_data["to_email"]],
+        )

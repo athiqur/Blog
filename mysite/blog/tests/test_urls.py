@@ -1,7 +1,7 @@
 from django.test import SimpleTestCase
 from blog.tests.test_modelmixintestcase import ModelMixinTestCase
 from django.urls import resolve, reverse
-from blog.views import post_share, PostListView
+from blog.views import PostListView, PostShareView
 
 
 class TestUrls(ModelMixinTestCase, SimpleTestCase):
@@ -14,6 +14,6 @@ class TestUrls(ModelMixinTestCase, SimpleTestCase):
         self.assertEquals(
             resolve(
                 reverse("blog:post_share", args=[self.published_post.id])
-            ).func,
-            post_share,
+            ).func.view_class,
+            PostShareView,
         )

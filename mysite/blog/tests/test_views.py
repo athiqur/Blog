@@ -3,6 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 from blog.models import Post
 from blog.forms import EmailPostForm
+from django.http import HttpResponse
 
 
 class TestListView(ModelMixinTestCase, TestCase):

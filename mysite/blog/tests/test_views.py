@@ -62,7 +62,6 @@ class TestDetailView(ModelMixinTestCase, TestCase):
         self.assertEqual(404, response.status_code)
 
 
-
 def test_pagination_returns_last_page_if_page_out_of_range(self):
     response = self.client.get(
         reverse("blog:post_list"),

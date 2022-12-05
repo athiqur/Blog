@@ -2,10 +2,6 @@ from django.urls import path
 from . import views
 
 app_name = "blog"
-<<<<<<< HEAD
-urlpatterns = [
-    path("", views.post_list, name="post_list"),
-=======
 
 urlpatterns = [
     path("", views.PostListView.as_view(), name="post_list"),
@@ -14,5 +10,4 @@ urlpatterns = [
         views.post_detail,
         name="post_detail",
     ),
->>>>>>> 7b3ab53 (Create detail view)
 ]

@@ -1,11 +1,13 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Post
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Post, Comment
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView, FormView
-from .forms import EmailPostForm
-from django.urls import reverse_lazy
+from .forms import EmailPostForm, CommentForm
+from django.urls import reverse_lazy, reverse
 from django.core.mail import send_mail
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
+from django.views.decorators.http import require_http_methods
 
 
 class PostListView(ListView):
@@ -13,6 +15,32 @@ class PostListView(ListView):
     context_object_name = "posts"
     paginate_by = 3
     template_name = "blog/post/list.html"
+
+
+@require_http_methods(["POST"])
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id, status="published")
+    comment_form = CommentForm(data=request.POST or None)
+    if comment_form.is_valid():
+        comment = comment_form.save(commit=False)
+        comment.post = post
+        comment.save()
+        messages.success(request, message="Comment added successfully")
+        return redirect(
+            "blog:post_detail",
+            post.publish.year,
+            post.publish.month,
+            post.publish.day,
+            post.slug,
+        )
+
+    return render(
+        request,
+        "blog/post/detail.html",
+        {
+            "comment_form": comment_form,
+        },
+    )
 
 
 def post_detail(request, year, month, day, post_slug):
@@ -24,7 +52,14 @@ def post_detail(request, year, month, day, post_slug):
         publish__month=month,
         publish__day=day,
     )
-    return render(request, "blog/post/detail.html", {"post": post})
+    return render(
+        request,
+        "blog/post/detail.html",
+        {
+            "post": post,
+            "comment_form": CommentForm,
+        },
+    )
 
 
 class PostShareView(SuccessMessageMixin, FormView):
@@ -42,6 +77,11 @@ class PostShareView(SuccessMessageMixin, FormView):
     def form_valid(self, form):
         self.send_mail(form.cleaned_data)
         return super(PostShareView, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["post"] = self.post_object
+        return context
 
     def send_mail(self, valid_data):
         post_url = self.request.build_absolute_uri(

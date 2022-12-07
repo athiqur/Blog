@@ -24,7 +24,6 @@ class PostListTagView(ListView):
     template_name = "blog/post/list.html"
 
     def dispatch(self, request, *args, **kwargs):
-        print(kwargs)
         self.tag = get_object_or_404(Tag, slug=self.kwargs.get("tag_slug"))
         return super().dispatch(request, args, kwargs)
 

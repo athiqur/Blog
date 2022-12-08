@@ -20,3 +20,20 @@ class TestCustomTemplateTags(ModelMixinTestCase, TestCase):
             post.title,
             blog_tags.show_latest_posts()["latest_posts"].first().title,
         )
+
+    def test_most_commented_post_tag(self):
+
+        most_commented_post = self.create_commented_posts(
+            self.published_post, 10
+        )
+        self.assertEqual(
+            blog_tags.get_most_commented_posts().first().title,
+            most_commented_post.title,
+        )
+
+    def test_post_without_comments(self):
+
+        post_without_comment = self.create_published_posts(1)
+        self.assertTrue(
+            post_without_comment not in blog_tags.get_most_commented_posts()
+        )

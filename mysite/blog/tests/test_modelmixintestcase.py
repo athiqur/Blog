@@ -1,5 +1,5 @@
 from django.test import TestCase
-from blog.models import Post
+from blog.models import Post, Comment
 from django.contrib.auth.models import User
 
 
@@ -24,7 +24,7 @@ class ModelMixinTestCase(TestCase):
             slug="published",
         )
 
-    def create_published_posts(self, count):
+    def create_published_posts(self, count=1):
         posts = []
         for _ in range(count):
             post = Post.objects.create(

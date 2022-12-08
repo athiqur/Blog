@@ -36,3 +36,13 @@ class ModelMixinTestCase(TestCase):
             )
             posts.append(post)
         return posts
+
+    def create_commented_posts(self, post, count):
+        for _ in range(count):
+            Comment.objects.create(
+                name="user",
+                email="athiqurking@gmail.com",
+                body="comments",
+                post=post,
+            )
+        return post

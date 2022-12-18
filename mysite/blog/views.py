@@ -8,6 +8,7 @@ from django.core.mail import send_mail
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
+from taggit.models import Tag
 
 
 class PostListView(ListView):
@@ -15,6 +16,24 @@ class PostListView(ListView):
     context_object_name = "posts"
     paginate_by = 3
     template_name = "blog/post/list.html"
+
+
+class PostListTagView(ListView):
+    context_object_name = "posts"
+    paginate_by = 3
+    template_name = "blog/post/list.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.tag = get_object_or_404(Tag, slug=self.kwargs.get("tag_slug"))
+        return super().dispatch(request, args, kwargs)
+
+    def get_queryset(self):
+        return Post.published.filter(tags__in=[self.tag])
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data["tag"] = self.tag
+        return data
 
 
 @require_http_methods(["POST"])

@@ -77,6 +77,7 @@ def post_detail(request, year, month, day, post_slug):
         {
             "post": post,
             "comment_form": CommentForm,
+            "similar_posts": post.get_top_four_similar_posts(),
         },
     )
 

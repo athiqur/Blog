@@ -8,14 +8,20 @@
 </head>
 
 <body>
-    <div id="content">
-        {% block content %}
-        {% endblock %}
-    </div>
-    <div id="sidebar">
-        <h2>My blog</h2>
-        <p>This is my blog.</p>
-    </div>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+            {% endfor %}
+            {% endif %}
+            <div id="content">
+                {% block content %}
+                {% endblock %}
+            </div>
+            <div id="sidebar">
+                <h2>My blog</h2>
+                <p>This is my blog.</p>
+            </div>
 </body>
 
 </html>
